@@ -88,9 +88,9 @@ public class RestDslMainRoute extends RouteBuilder {
 		.marshal().json(JsonLibrary.Jackson)
 		.log(LoggingLevel.INFO, "Inicia ruta  kafka con mensaje => ${body}")
 		.removeHeaders("*")
-//		.setHeader(KafkaConstants.PARTITION_KEY, constant(0))
-		.setHeader(KafkaConstants.KEY, constant("Camel"))
-		.to("kafka:{{kafka.topic}}?brokers={{kafka.host}}:{{kafka.port}}")
+		.setHeader(KafkaConstants.PARTITION_KEY, constant(0))
+		.setHeader(KafkaConstants.KEY, constant("1"))
+		.to("kafka:{{kafka.host}}:{{kafka.port}}?topic={{kafka.topic}}")
 		.log("despues de entregar mensaje: ${headers}");
 
 		from("direct:kafkaStartNoTopic").routeId("kafkaStartNoTopic").to("kafka:dummy").log("${headers}");
