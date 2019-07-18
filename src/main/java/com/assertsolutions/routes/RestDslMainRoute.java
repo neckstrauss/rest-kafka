@@ -43,7 +43,7 @@ public class RestDslMainRoute extends RouteBuilder {
 	public void configure() throws Exception {
 		camelContext.setUseMDCLogging(Boolean.TRUE);
 		KafkaComponent kafka = new KafkaComponent();
-		kafka.setBrokers("apache-kafka-spring-boot-camel.192.168.1.200.xip.io");
+		kafka.setBrokers(env.getProperty("kafka.url"));
 		camelContext.addComponent("kafka", kafka);
 
 		onException(BeanValidationException.class)
