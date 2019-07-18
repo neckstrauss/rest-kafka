@@ -42,9 +42,9 @@ public class RestDslMainRoute extends RouteBuilder {
 	@Override
 	public void configure() throws Exception {
 		camelContext.setUseMDCLogging(Boolean.TRUE);
-		KafkaComponent kafka = new KafkaComponent();
-		kafka.setBrokers(env.getProperty("kafka.url"));
-		camelContext.addComponent("kafka", kafka);
+//		KafkaComponent kafka = new KafkaComponent();
+//		kafka.setBrokers(env.getProperty("kafka.url"));
+//		camelContext.addComponent("kafka", kafka);
 
 		onException(BeanValidationException.class)
 		.handled(true)
@@ -90,7 +90,7 @@ public class RestDslMainRoute extends RouteBuilder {
 		.removeHeaders("*")
 //		.setHeader(KafkaConstants.PARTITION_KEY, constant(0))
 		.setHeader(KafkaConstants.KEY, constant("Camel"))
-		.to("kafka:TestLog")
+		.to("kafka:{{kafka.topic}}?brokers={{kafka.host}}:{{kafka.port}}")
 		.log("despues de entregar mensaje: ${headers}");
 
 		from("direct:kafkaStartNoTopic").routeId("kafkaStartNoTopic").to("kafka:dummy").log("${headers}");
