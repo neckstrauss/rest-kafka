@@ -15,9 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.assertsolutions.beans.ErrorResponseHandler;
-import com.assertsolutions.beans.ResponseHandler;
 import com.assertsolutions.dto.AuditoriaRequest;
+import com.assertsolutions.properties.KafkaProducer;
 
 /**
  * 
@@ -39,11 +38,14 @@ public class RestDslMainRoute extends RouteBuilder {
 	@Autowired
 	private Environment env;
 	
+	@Autowired
+	private KafkaProducer kafkaProperties;
+	
 	@Override
 	public void configure() throws Exception {
 		camelContext.setUseMDCLogging(Boolean.TRUE);
 		KafkaComponent kafka = new KafkaComponent();
-		kafka.setBrokers("{{kafka.host}}:{{kafka.port}}");
+		kafka.setBrokers(kafkaProperties.getHost() + ":" + kafkaProperties.getPort());
 		camelContext.addComponent("kafka", kafka);
 
 		onException(BeanValidationException.class)
@@ -90,7 +92,7 @@ public class RestDslMainRoute extends RouteBuilder {
 		.removeHeaders("*")
 		.setHeader(KafkaConstants.PARTITION_KEY, constant(0))
 		.setHeader(KafkaConstants.KEY, constant("1"))
-		.to("kafka:{{kafka.topic}}")
+		.to("kafka:" + kafkaProperties.getTopic())
 		.log("despues de entregar mensaje: ${headers}");
 
 		from("direct:kafkaStartNoTopic").routeId("kafkaStartNoTopic").to("kafka:dummy").log("${headers}");
