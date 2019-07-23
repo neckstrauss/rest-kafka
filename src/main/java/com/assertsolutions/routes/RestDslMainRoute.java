@@ -12,11 +12,9 @@ import org.apache.camel.model.rest.RestBindingMode;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.assertsolutions.dto.AuditoriaRequest;
-import com.assertsolutions.properties.KafkaProducer;
 
 /**
  * 
@@ -35,17 +33,12 @@ public class RestDslMainRoute extends RouteBuilder {
 	@Autowired
 	private CamelContext camelContext;
 
-	@Autowired
-	private Environment env;
-	
-	@Autowired
-	private KafkaProducer kafkaProperties;
-	
+
 	@Override
 	public void configure() throws Exception {
 		camelContext.setUseMDCLogging(Boolean.TRUE);
 		KafkaComponent kafka = new KafkaComponent();
-		kafka.setBrokers(kafkaProperties.getHost() + ":" + kafkaProperties.getPort());
+		kafka.setBrokers("{{kafka.host}}:{{kafka.port}}");
 		camelContext.addComponent("kafka", kafka);
 
 		onException(BeanValidationException.class)
@@ -62,10 +55,10 @@ public class RestDslMainRoute extends RouteBuilder {
 		;
 		
 		 restConfiguration().component("servlet").bindingMode(RestBindingMode.json)
-	        .dataFormatProperty("prettyPrint", "true").enableCORS(true).port(env.getProperty("server.port", "8080"))
+	        .dataFormatProperty("prettyPrint", "true").enableCORS(true).port("{{server.port}}")
 	        .contextPath(contextPath.substring(0, contextPath.length() - 2))
-	        .apiContextPath("/api-doc").apiProperty("api.title", env.getProperty("api.title"))
-	        .apiProperty("api.version", env.getProperty("api.version"));
+	        .apiContextPath("/api-doc").apiProperty("api.title", "{{api.title}}")
+	        .apiProperty("api.version", "{{api.version}}");
 	        
 		
 		rest("/karaf")
@@ -92,7 +85,7 @@ public class RestDslMainRoute extends RouteBuilder {
 		.removeHeaders("*")
 		.setHeader(KafkaConstants.PARTITION_KEY, constant(0))
 		.setHeader(KafkaConstants.KEY, constant("1"))
-		.to("kafka:" + kafkaProperties.getTopic())
+		.to("kafka:{{kafka.topic}}" )
 		.log("despues de entregar mensaje: ${headers}");
 
 		from("direct:kafkaStartNoTopic").routeId("kafkaStartNoTopic").to("kafka:dummy").log("${headers}");

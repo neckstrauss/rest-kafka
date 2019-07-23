@@ -24,6 +24,8 @@
 		<spring-cloud.version>2.0.4.BUILD-SNAPSHOT</spring-cloud.version>
 	</properties>
 
+
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -37,6 +39,7 @@
 	</dependencyManagement>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-spring-boot-starter</artifactId>
@@ -108,9 +111,9 @@
 			<resource>
 				<filtering>true</filtering>
 				<directory>src/main/resources</directory>
-				<includes>
-					<include>application.properties</include>
-					<include>logback.xml</include>
+				<includes>					
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
 				</includes>
 			</resource>
 		</resources>
